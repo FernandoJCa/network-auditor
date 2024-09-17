@@ -1,8 +1,8 @@
-# Herramienta de Auditoría de Configuración de Red
+# Herramienta de Auditoría de Configuración de Red (ESP)
 
 ## Visión General
 
-Esta Herramienta de Auditoría de Configuración de Red es un script Python diseñado para auditar y reportar configuraciones de red en sistemas Linux, tanto localmente como de forma remota. Proporciona una visión completa de las interfaces de red activas, direcciones IP, tablas de enrutamiento, reglas de cortafuegos (UFW) y conexiones de red abiertas. Esta herramienta es particularmente útil para administradores de sistemas y profesionales de redes que necesitan comprobar rápidamente varios aspectos de su configuración de red en sistemas locales o remotos.
+Esta Herramienta de Auditoría de Configuración de Red es un script Python diseñado para auditar y reportar configuraciones de red en sistemas Linux, tanto localmente como de forma remota. Proporciona una visión completa de las interfaces de red activas, direcciones IP, tablas de enrutamiento, reglas de cortafuegos (UFW), conexiones de red abiertas y redes de Docker. Esta herramienta es particularmente útil para administradores de sistemas y profesionales de redes que necesitan comprobar rápidamente varios aspectos de su configuración de red en sistemas locales o remotos.
 
 ## Características
 
@@ -12,20 +12,23 @@ Esta Herramienta de Auditoría de Configuración de Red es un script Python dise
 - **Tabla de Enrutamiento**: Muestra la tabla de enrutamiento actual.
 - **Reglas del cortafuegos**: Muestra las primeras reglas del cortafuegos (UFW).
 - **Conexiones abiertas**: Lista algunas de las conexiones de red abiertas.
+- **Redes de Docker**: Muestra las redes de Docker, incluyendo nombres de host y direcciones IP.
 - **Menú Interactivo**: Proporciona un menú interactivo para facilitar la navegación y la selección de comprobaciones específicas.
 - **Salida codificada por colores**: Mejora la legibilidad resaltando la información importante.
 - **Registro**: Registra todas las acciones y errores en `audit_network.log` con fines de auditoría y depuración.
+- **Verificación de clave de host SSH**: Implementa verificación de clave de host para conexiones SSH remotas.
 
 ## Requisitos previos
 
 - **Python 3.x**: Asegúrate de que Python 3.x está instalado en tu sistema.
 - **Librerías Python**: El script instalará automáticamente las siguientes librerías si no están presentes:
-    - `tabulate`: Para formatear tablas en la salida.
-    - `paramiko`: Para conexiones SSH a sistemas remotos.
+  - `tabulate`: Para formatear tablas en la salida.
+  - `paramiko`: Para conexiones SSH a sistemas remotos.
 - **Comandos del sistema**: El script requiere que los siguientes comandos estén disponibles en el sistema auditado:
-    - `ip`
-    - `ss`
-    - `ufw` (para reglas de cortafuegos)
+  - `ip`
+  - `ss`
+  - `ufw` (para reglas de cortafuegos)
+  - `docker` (para información de redes de Docker)
 
 ## Instalación
 
@@ -72,10 +75,11 @@ Network Configuration Audit Menu:
 3. Show routing table
 4. Show firewall rules
 5. List open network connections
-6. Run all checks
-7. Exit
+6. List Docker networks
+7. Run all checks
+8. Exit
 
-Enter your choice: 6
+Enter your choice: 7
 
 Network interfaces and their status:
 +--------------+--------+
@@ -119,7 +123,20 @@ Some open network connections:
 | LISTEN | 0.0.0.0:80        | 0.0.0.0:*         |
 +--------+-------------------+-------------------+
 
-Enter your choice: 7
+Docker Networks:
++----------------+------------+----------------+
+| Network Name   | Host Name  | Host IP        |
++----------------+------------+----------------+
+| bridge         |            |                |
+|                | alpine1    | 172.17.0.2/16  |
+|                | alpine2    | 172.17.0.3/16  |
++----------------+------------+----------------+
+| host           |            |                |
++----------------+------------+----------------+
+| none           |            |                |
++----------------+------------+----------------+
+
+Enter your choice: 8
 SSH connection closed.
 Exiting. Thank you for using the Network Configuration Audit tool.
 ```
@@ -127,6 +144,10 @@ Exiting. Thank you for using the Network Configuration Audit tool.
 ## Logging
 
 Todas las acciones y errores se registran en `audit_network.log`. Este archivo de registro puede ser útil para propósitos de auditoría y depuración.
+
+## Seguridad
+
+El script ahora incluye verificación de clave de host SSH para conexiones remotas, mejorando la seguridad al prevenir ataques de tipo "man-in-the-middle".
 
 ## Contribuciones
 
@@ -138,7 +159,7 @@ Todas las acciones y errores se registran en `audit_network.log`. Este archivo d
 
 ## Overview
 
-The Network Configuration Audit Tool is a Python script designed to audit and report system network configurations on Linux systems, both locally and remotely. It provides a comprehensive overview of active network interfaces, IP addresses, routing tables, firewall rules (UFW), and open network connections. The tool is particularly useful for system administrators and network professionals who need to quickly check various aspects of their network setup on local or remote systems.
+The Network Configuration Audit Tool is a Python script designed to audit and report system network configurations on Linux systems, both locally and remotely. It provides a comprehensive overview of active network interfaces, IP addresses, routing tables, firewall rules (UFW), open network connections, and Docker networks. The tool is particularly useful for system administrators and network professionals who need to quickly check various aspects of their network setup on local or remote systems.
 
 ## Features
 
@@ -148,20 +169,23 @@ The Network Configuration Audit Tool is a Python script designed to audit and re
 - **Routing Table**: Shows the current routing table.
 - **Firewall Rules**: Displays the firewall rules (UFW).
 - **Open Connections**: Lists some of the open network connections.
+- **Docker Networks**: Shows Docker networks, including host names and IP addresses.
 - **Interactive Menu**: Provides an interactive menu for easy navigation and selection of specific checks.
 - **Color-Coded Output**: Enhances readability by highlighting important information.
 - **Logging**: Logs all actions and errors to `audit_network.log` for auditing and debugging purposes.
+- **SSH Host Key Verification**: Implements host key verification for remote SSH connections.
 
 ## Prerequisites
 
 - **Python 3.x**: Ensure Python 3.x is installed on your system.
 - **Python Libraries**: The script will automatically install the following libraries if not present:
-    - `tabulate`: For formatting tables in the output.
-    - `paramiko`: For SSH connections to remote systems.
+  - `tabulate`: For formatting tables in the output.
+  - `paramiko`: For SSH connections to remote systems.
 - **System Commands**: The script requires the following commands to be available on the audited system:
-    - `ip`
-    - `ss`
-    - `ufw` (for firewall rules)
+  - `ip`
+  - `ss`
+  - `ufw` (for firewall rules)
+  - `docker` (for Docker network information)
 
 ## Installation
 
@@ -208,10 +232,11 @@ Network Configuration Audit Menu:
 3. Show routing table
 4. Show firewall rules
 5. List open network connections
-6. Run all checks
-7. Exit
+6. List Docker networks
+7. Run all checks
+8. Exit
 
-Enter your choice: 6
+Enter your choice: 7
 
 Network interfaces and their status:
 +--------------+--------+
@@ -255,7 +280,20 @@ Some open network connections:
 | LISTEN | 0.0.0.0:80        | 0.0.0.0:*         |
 +--------+-------------------+-------------------+
 
-Enter your choice: 7
+Docker Networks:
++----------------+------------+----------------+
+| Network Name   | Host Name  | Host IP        |
++----------------+------------+----------------+
+| bridge         |            |                |
+|                | alpine1    | 172.17.0.2/16  |
+|                | alpine2    | 172.17.0.3/16  |
++----------------+------------+----------------+
+| host           |            |                |
++----------------+------------+----------------+
+| none           |            |                |
++----------------+------------+----------------+
+
+Enter your choice: 8
 SSH connection closed.
 Exiting. Thank you for using the Network Configuration Audit tool.
 ```
@@ -263,6 +301,10 @@ Exiting. Thank you for using the Network Configuration Audit tool.
 ## Logging
 
 All actions and errors are logged to `audit_network.log`. This log file can be useful for auditing and debugging purposes.
+
+## Security
+
+The script now includes SSH host key verification for remote connections, enhancing security by preventing man-in-the-middle attacks.
 
 ## Contributing
 
