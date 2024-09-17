@@ -1,12 +1,12 @@
-
-# Herramienta de Auditoría de Configuración de Red (ESP) 
+# Herramienta de Auditoría de Configuración de Red
 
 ## Visión General
 
-Esta Herramienta de Auditoría de Configuración de Red es un script Python diseñado para auditar y reportar configuraciones de red en sistemas Linux. Proporciona una visión completa de las interfaces de red activas, direcciones IP, tablas de enrutamiento, reglas de cortafuegos (UFW) y conexiones de red abiertas. Esta herramienta es particularmente útil para administradores de sistemas y profesionales de redes que necesitan comprobar rápidamente varios aspectos de su configuración de red.
+Esta Herramienta de Auditoría de Configuración de Red es un script Python diseñado para auditar y reportar configuraciones de red en sistemas Linux, tanto localmente como de forma remota. Proporciona una visión completa de las interfaces de red activas, direcciones IP, tablas de enrutamiento, reglas de cortafuegos (UFW) y conexiones de red abiertas. Esta herramienta es particularmente útil para administradores de sistemas y profesionales de redes que necesitan comprobar rápidamente varios aspectos de su configuración de red en sistemas locales o remotos.
 
 ## Características
 
+- **Auditoría Local y Remota**: Capacidad de auditar sistemas locales y remotos mediante SSH.
 - **Interfaces de red**: Lista todas las interfaces de red y su estado (activo/inactivo).
 - **Direcciones IP**: Muestra las direcciones IP asignadas a cada interfaz de red.
 - **Tabla de Enrutamiento**: Muestra la tabla de enrutamiento actual.
@@ -19,42 +19,52 @@ Esta Herramienta de Auditoría de Configuración de Red es un script Python dise
 ## Requisitos previos
 
 - **Python 3.x**: Asegúrate de que Python 3.x está instalado en tu sistema.
-- **Librería Tabulate**: Instala la librería `tabulate` usando pip:
-
-  ```bash
-  pip install tabulate
-  ```
-- **Comandos del sistema**: El script requiere que los siguientes comandos estén disponibles en tu sistema:
-  - `ip`
-  - `ss
-  - `ufw` (para reglas de cortafuegos)
+- **Librerías Python**: El script instalará automáticamente las siguientes librerías si no están presentes:
+    - `tabulate`: Para formatear tablas en la salida.
+    - `paramiko`: Para conexiones SSH a sistemas remotos.
+- **Comandos del sistema**: El script requiere que los siguientes comandos estén disponibles en el sistema auditado:
+    - `ip`
+    - `ss`
+    - `ufw` (para reglas de cortafuegos)
 
 ## Instalación
 
-1. Clona el repositorio en su máquina local:
+1. Clona el repositorio en tu máquina local:
 
 ```bash
-   git clone https://github.com/elliotsecops/network-auditor.git
-   cd network-auditor
-   ```
-2. Instale el paquete Python necesario:
+git clone https://github.com/elliotsecops/network-auditor.git
+cd network-auditor
+```
 
-```bash
-   pip install tabulate
-   ```
+2. El script instalará automáticamente las dependencias necesarias al ejecutarse.
+
 ## Uso
 
-1. Ejecute el script (con permisos de superusuario si es necesario):
+1. Ejecute el script:
 
 ```bash
-   python network_audit.py
-   ```
-2. El script presentará un menú interactivo. Elija la opción deseada para realizar comprobaciones específicas o ejecutar todas las comprobaciones secuencialmente.
+python network_audit.py
+```
+
+2. Elija el modo de auditoría (local o remoto).
+3. Si se selecciona el modo remoto, proporcione la información de conexión SSH cuando se le solicite.
+4. El script presentará un menú interactivo. Elija la opción deseada para realizar comprobaciones específicas o ejecutar todas las comprobaciones secuencialmente.
+
+### Opciones de Autenticación SSH (para auditoría remota)
+
+- **Agente SSH**: El script intentará primero usar el agente SSH si está disponible.
+- **Contraseña**: Puede introducir la contraseña SSH cuando se le solicite.
+- **Clave SSH**: Puede especificar la ruta a su clave privada SSH.
 
 ### Ejemplo del output:
 
 ```
 Network Configuration Audit
+
+Choose mode (local/remote): remote
+Enter the IP or hostname of the target server: 192.168.1.100
+Enter SSH username: user
+Successfully connected to 192.168.1.100 using SSH agent.
 
 Network Configuration Audit Menu:
 1. List network interfaces
@@ -81,7 +91,7 @@ IP addresses assigned to each interface:
 | Interface    | IP Address     |
 +--------------+----------------+
 | lo           | 127.0.0.1/8    |
-| eth0         | 192.168.1.2/24 |
+| eth0         | 192.168.1.100/24 |
 +--------------+----------------+
 
 Current routing table:
@@ -89,16 +99,16 @@ Current routing table:
 | Route                                                                  |
 +------------------------------------------------------------------------+
 | default via 192.168.1.1 dev eth0                                       |
-| 192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.2       |
-| 127.0.0.0/8 dev lo proto kernel scope link src 127.0.0.1              |
+| 192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.100      |
+| 127.0.0.0/8 dev lo proto kernel scope link src 127.0.0.1               |
 +------------------------------------------------------------------------+
 
-First firewall (UFW) rules:
+Firewall (UFW) rules:
 +----------------------------------------+
 | UFW Rule                               |
 +----------------------------------------+
-| [ 1] 22/tcp (v6) ALLOW IN Anywhere (v6)|
-| [ 2] 80/tcp (v6) ALLOW IN Anywhere (v6)|
+| [ 1] 22/tcp ALLOW IN Anywhere          |
+| [ 2] 80/tcp ALLOW IN Anywhere          |
 +----------------------------------------+
 
 Some open network connections:
@@ -109,12 +119,14 @@ Some open network connections:
 | LISTEN | 0.0.0.0:80        | 0.0.0.0:*         |
 +--------+-------------------+-------------------+
 
+Enter your choice: 7
+SSH connection closed.
 Exiting. Thank you for using the Network Configuration Audit tool.
 ```
 
-## Loggings
+## Logging
 
-Todas las acciones y errores se registran en `audit_network.log`. Este archivo "log" puede ser útil para propósitos de auditoría y depuración.
+Todas las acciones y errores se registran en `audit_network.log`. Este archivo de registro puede ser útil para propósitos de auditoría y depuración.
 
 ## Contribuciones
 
@@ -122,18 +134,19 @@ Todas las acciones y errores se registran en `audit_network.log`. Este archivo "
 
 ---
 
-# Network Configuration Audit Tool (EN) 
+# Network Configuration Audit Tool
 
 ## Overview
 
-The Network Configuration Audit Tool is a Python script designed to audit and report system network configurations on Linux systems. It provides a comprehensive overview of active network interfaces, IP addresses, routing tables, firewall rules (UFW), and open network connections. The tool is particularly useful for system administrators and network professionals who need to quickly check various aspects of their network setup.
+The Network Configuration Audit Tool is a Python script designed to audit and report system network configurations on Linux systems, both locally and remotely. It provides a comprehensive overview of active network interfaces, IP addresses, routing tables, firewall rules (UFW), and open network connections. The tool is particularly useful for system administrators and network professionals who need to quickly check various aspects of their network setup on local or remote systems.
 
 ## Features
 
+- **Local and Remote Auditing**: Ability to audit both local and remote systems via SSH.
 - **Network Interfaces**: Lists all network interfaces and their status (active/inactive).
 - **IP Addresses**: Displays the IP addresses assigned to each network interface.
 - **Routing Table**: Shows the current routing table.
-- **Firewall Rules**: Displays the first firewall rules (UFW).
+- **Firewall Rules**: Displays the firewall rules (UFW).
 - **Open Connections**: Lists some of the open network connections.
 - **Interactive Menu**: Provides an interactive menu for easy navigation and selection of specific checks.
 - **Color-Coded Output**: Enhances readability by highlighting important information.
@@ -142,45 +155,52 @@ The Network Configuration Audit Tool is a Python script designed to audit and re
 ## Prerequisites
 
 - **Python 3.x**: Ensure Python 3.x is installed on your system.
-- **Tabulate Library**: Install the `tabulate` library using pip:
-
-  ```bash
-  pip install tabulate
-  ```
-- **System Commands**: The script requires the following commands to be available on your system:
-  - `ip`
-  - `ss`
-  - `ufw` (for firewall rules)
+- **Python Libraries**: The script will automatically install the following libraries if not present:
+    - `tabulate`: For formatting tables in the output.
+    - `paramiko`: For SSH connections to remote systems.
+- **System Commands**: The script requires the following commands to be available on the audited system:
+    - `ip`
+    - `ss`
+    - `ufw` (for firewall rules)
 
 ## Installation
 
 1. Clone the repository to your local machine:
 
-   ```bash
-   git clone git clone https://github.com/elliotsecops/network-auditor.git
-   cd network-auditor
-   ```
+```bash
+git clone https://github.com/elliotsecops/network-auditor.git
+cd network-auditor
+```
 
-2. Install the required Python package:
-
-   ```bash
-   pip install tabulate
-   ```
+2. The script will automatically install the necessary dependencies when run.
 
 ## Usage
 
 1. Run the script:
 
-   ```bash
-   python network_audit.py
-   ```
+```bash
+python network_audit.py
+```
 
-2. The script will present an interactive menu. Choose the desired option to perform specific checks or run all checks sequentially.
+2. Choose the auditing mode (local or remote).
+3. If remote mode is selected, provide SSH connection information when prompted.
+4. The script will present an interactive menu. Choose the desired option to perform specific checks or run all checks sequentially.
 
-### Example Output
+### SSH Authentication Options (for remote auditing)
+
+- **SSH Agent**: The script will first attempt to use the SSH agent if available.
+- **Password**: You can enter the SSH password when prompted.
+- **SSH Key**: You can specify the path to your SSH private key.
+
+### Example Output:
 
 ```
 Network Configuration Audit
+
+Choose mode (local/remote): remote
+Enter the IP or hostname of the target server: 192.168.1.100
+Enter SSH username: user
+Successfully connected to 192.168.1.100 using SSH agent.
 
 Network Configuration Audit Menu:
 1. List network interfaces
@@ -207,7 +227,7 @@ IP addresses assigned to each interface:
 | Interface    | IP Address     |
 +--------------+----------------+
 | lo           | 127.0.0.1/8    |
-| eth0         | 192.168.1.2/24 |
+| eth0         | 192.168.1.100/24 |
 +--------------+----------------+
 
 Current routing table:
@@ -215,16 +235,16 @@ Current routing table:
 | Route                                                                  |
 +------------------------------------------------------------------------+
 | default via 192.168.1.1 dev eth0                                       |
-| 192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.2       |
-| 127.0.0.0/8 dev lo proto kernel scope link src 127.0.0.1              |
+| 192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.100      |
+| 127.0.0.0/8 dev lo proto kernel scope link src 127.0.0.1               |
 +------------------------------------------------------------------------+
 
-First firewall (UFW) rules:
+Firewall (UFW) rules:
 +----------------------------------------+
 | UFW Rule                               |
 +----------------------------------------+
-| [ 1] 22/tcp (v6) ALLOW IN Anywhere (v6)|
-| [ 2] 80/tcp (v6) ALLOW IN Anywhere (v6)|
+| [ 1] 22/tcp ALLOW IN Anywhere          |
+| [ 2] 80/tcp ALLOW IN Anywhere          |
 +----------------------------------------+
 
 Some open network connections:
@@ -235,14 +255,15 @@ Some open network connections:
 | LISTEN | 0.0.0.0:80        | 0.0.0.0:*         |
 +--------+-------------------+-------------------+
 
+Enter your choice: 7
+SSH connection closed.
 Exiting. Thank you for using the Network Configuration Audit tool.
 ```
 
 ## Logging
 
-All actions and errors are logged to `audit_network.log`. This file can be useful for auditing and debugging purposes.
+All actions and errors are logged to `audit_network.log`. This log file can be useful for auditing and debugging purposes.
 
 ## Contributing
 
 Contributions are welcome! If you have any suggestions, bug reports, or feature requests, please open an issue or submit a pull request.
-
